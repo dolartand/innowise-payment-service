@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: dolartand
+      changes:
+        - mongodb:createCollection:
+            collectionName: "payments"
+            options: |
+              {
+                "validator": {
+                  "$jsonSchema": {
+                    "bsonType": "object",
+                    "required": ["orderId", "userId", "status", "timestamp", "paymentAmount"],
+                    "properties": {
+                      "orderId": {
+                        "bsonType": "int",
+                        "description": "Order id is required"
+                      },
+                      "userId": {
+                        "bsonType": "int",
+                        "description": "User id is required"
+                      },
+                      "status": {
+                        "bsonType": "enum": ["PENDING", "PROCESSING", "SUCCESS", "FAILED", "CANCELLED"],
+                        "description": "Payment status"
+                      },
+                      "timestamp": {
+                        "bsonType": "date",
+                        "description": "Payment creation timestamp"
+                      },
+                      "paymentAmount": {
+                        "bsonType": "decimal",
+                        "minimum": 0,
+                        "description": "Payment amount"
+                      }
+                    }
+                  }
+                }
+              }
+
+  - changeSet:
+      id: 2
+      author: dolartand
+      changes:
+        - mongodb:createIndex:
+            collectionName: "payments"
+            keys: "{ 'userId': 1 }"
+            options: "{ 'name': 'idx_user_id' }"
+
+  - changeSet:
+      id: 3
+      author: dolartand
+      changes:
+        - mongodb:createIndex:
+            collectionName: "payments"
+            keys: "{ 'orderId': 1 }"
+            options: "{ 'name': 'idx_order_id', 'unique': true }"
+
+  - changeSet:
+      id: 4
+      author: dolartand
+      changes:
+        - mongodb:createIndex:
+            collectionName: "payments"
+            keys: "{ 'status': 1 }"
+            options: "{ 'name': 'idx_status' }"
+
+  - changeSet:
+      id: 5
+      author: dolartand
+      changes:
+        - mongodb:createIndex:
+            collectionName: "payments"
+            keys: "{ 'timestamp': -1 }"
+            options: "{ 'name': 'idx_timestamp_desc' }"
