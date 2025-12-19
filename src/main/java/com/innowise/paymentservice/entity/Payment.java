@@ -27,7 +27,6 @@ public class Payment {
     private Long orderId;
 
     @Field("user_id")
-    @Indexed(unique = true)
     private Long userId;
 
     @Field("status")
