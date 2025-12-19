@@ -21,7 +21,7 @@ databaseChangeLog:
                         "description": "User id is required"
                       },
                       "status": {
-                        "bsonType": "enum": ["PENDING", "PROCESSING", "SUCCESS", "FAILED", "CANCELLED"],
+                        "enum": ["PENDING", "PROCESSING", "SUCCESS", "FAILED", "CANCELLED"],
                         "description": "Payment status"
                       },
                       "timestamp": {
