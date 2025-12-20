@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: Payment service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/payment_db
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: mongodb://localhost:27017/payment_db
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.innowise.*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+
+kafka:
+  topics:
+    order-events: order-events
+    payment-events: payment-events
+
+random:
+  org:
+    api:
+      url: https://www.random.org/integers/?num=1&min=1&max=100&col=1&base=10&format=plain
+
+service:
+  api:
+    key: dev-service-key
+
+server:
+  port: 8084
+
+logging:
+  level:
+    root: INFO
+    com.innowise.paymentservice: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG

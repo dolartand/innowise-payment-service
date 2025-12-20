@@ -1,12 +1,5 @@
 spring:
   application:
     name: Payment service
-
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/payment_db
-
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-    url: mongodb://localhost:27017/payment_db
+  profiles:
+    active: local
