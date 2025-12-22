@@ -1,5 +1,6 @@
 package com.innowise.paymentservice.repository;
 
+import com.innowise.paymentservice.dto.TotalAmountAggregationResult;
 import com.innowise.paymentservice.entity.Payment;
 import com.innowise.paymentservice.enums.PaymentStatus;
 import org.springframework.data.domain.Page;
@@ -32,12 +33,12 @@ public interface PaymentRepository extends MongoRepository<Payment, String> {
             "{ '$match': { 'userId': ?0, 'timestamp': { '$gte': ?1, '$lte': ?2 } } }",
             "{ '$group': { '_id': null, 'total': { '$sum': '$paymentAmount' } } }"
     })
-    BigDecimal getTotalAmountByUserIdAndDateRange(Long userId, LocalDateTime from, LocalDateTime to
+    Optional<TotalAmountAggregationResult> getTotalAmountByUserIdAndDateRange(Long userId, LocalDateTime from, LocalDateTime to
     );
 
     @Aggregation(pipeline = {
             "{ '$match': { 'timestamp': { '$gte': ?0, '$lte': ?1 } } }",
             "{ '$group': { '_id': null, 'total': { '$sum': '$paymentAmount' } } }"
     })
-    BigDecimal getTotalAmountForDateRange(LocalDateTime from, LocalDateTime to);
+    Optional<TotalAmountAggregationResult> getTotalAmountForDateRange(LocalDateTime from, LocalDateTime to);
 }

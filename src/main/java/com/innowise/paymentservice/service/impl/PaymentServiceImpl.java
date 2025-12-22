@@ -4,6 +4,7 @@ import com.innowise.paymentservice.client.RandomOrgClient;
 import com.innowise.paymentservice.dto.CreatePaymentRequest;
 import com.innowise.paymentservice.dto.PaymentResponse;
 import com.innowise.paymentservice.dto.PaymentSummaryResponse;
+import com.innowise.paymentservice.dto.TotalAmountAggregationResult;
 import com.innowise.paymentservice.entity.Payment;
 import com.innowise.paymentservice.enums.PaymentStatus;
 import com.innowise.paymentservice.exception.ExternalServiceException;
@@ -66,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse getPaymentByOrderId(Long orderId) {
         log.debug("Getting payment for orderId={}", orderId);
         Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found for orderId= " + orderId));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found for orderId=" + orderId));
 
         return paymentMapper.toDto(payment);
     }
@@ -108,7 +109,9 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentSummaryResponse getTotalAmountByUserAndDateRange(Long userId, LocalDateTime from, LocalDateTime to) {
         log.debug("Calculating total amount for userId={} from {} to {}", userId, from, to);
 
-        BigDecimal totalAmount = paymentRepository.getTotalAmountByUserIdAndDateRange(userId, from, to);
+        BigDecimal totalAmount = paymentRepository.getTotalAmountByUserIdAndDateRange(userId, from, to)
+                .map(TotalAmountAggregationResult::totalAmount)
+                .orElse(BigDecimal.ZERO);
 
         List<Payment> payments = paymentRepository.findByUserId(userId);
         long count = payments.stream()
@@ -116,7 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .count();
 
         return PaymentSummaryResponse.builder()
-                .totalAmount(totalAmount != null ? totalAmount : BigDecimal.ZERO)
+                .totalAmount(totalAmount)
                 .fromDate(from)
                 .toDate(to)
                 .userId(userId)
@@ -129,14 +132,16 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentSummaryResponse getTotalAmountForDateRange(LocalDateTime from, LocalDateTime to) {
         log.debug("Calculating total amount for all users from {} to {}", from, to);
 
-        BigDecimal totalAmount = paymentRepository.getTotalAmountForDateRange(from, to);
+        BigDecimal totalAmount = paymentRepository.getTotalAmountForDateRange(from, to)
+                .map(TotalAmountAggregationResult::totalAmount)
+                .orElse(BigDecimal.ZERO);
 
         long count = paymentRepository.findAll().stream()
                 .filter(p -> p.getTimestamp().isAfter(from) && p.getTimestamp().isBefore(to))
                 .count();
 
         return PaymentSummaryResponse.builder()
-                .totalAmount(totalAmount != null ? totalAmount : BigDecimal.ZERO)
+                .totalAmount(totalAmount)
                 .fromDate(from)
                 .toDate(to)
                 .userId(null)
