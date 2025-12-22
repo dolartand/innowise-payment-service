@@ -14,7 +14,7 @@ public class RandomOrgClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${random.org.api.url:https://www.random.org/integers/?num=1&min=1&max=100&col=1&base=10&format=plain}")
+    @Value("${randomorg.api.url:https://www.random.org/integers/?num=1&min=1&max=100&col=1&base=10&format=plain}")
     private String randomOrgUrl;
 
     public Integer generateRandomNumber() {
