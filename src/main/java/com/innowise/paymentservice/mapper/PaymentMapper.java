@@ -15,8 +15,10 @@ public interface PaymentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "timestamp", ignore = true)
+    @Mapping(target = "paymentAmount", source = "paymentAmount")
     Payment toEntity(CreatePaymentRequest dto);
 
+    @Mapping(target = "totalAmount", source = "paymentAmount")
     PaymentResponse toDto(Payment entity);
 
     List<PaymentResponse> toDtoList(List<Payment> entities);

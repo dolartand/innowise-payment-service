@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,15 +31,14 @@ public interface PaymentRepository extends MongoRepository<Payment, String> {
     Page<Payment> findByStatus(PaymentStatus status, Pageable pageable);
 
     @Aggregation(pipeline = {
-            "{ '$match': { 'userId': ?0, 'timestamp': { '$gte': ?1, '$lte': ?2 } } }",
-            "{ '$group': { '_id': null, 'total': { '$sum': '$paymentAmount' } } }"
+            "{ '$match': { 'user_id': ?0, 'timestamp': { '$gte': ?1, '$lte': ?2 } } }",
+            "{ '$group': { '_id': null, 'totalAmount': { '$sum': '$payment_amount' } } }"
     })
-    Optional<TotalAmountAggregationResult> getTotalAmountByUserIdAndDateRange(Long userId, LocalDateTime from, LocalDateTime to
-    );
+    Optional<TotalAmountAggregationResult> getTotalAmountByUserIdAndDateRange(Long userId, Date from, Date to);
 
     @Aggregation(pipeline = {
             "{ '$match': { 'timestamp': { '$gte': ?0, '$lte': ?1 } } }",
-            "{ '$group': { '_id': null, 'total': { '$sum': '$paymentAmount' } } }"
+            "{ '$group': { '_id': null, 'totalAmount': { '$sum': '$payment_amount' } } }"
     })
-    Optional<TotalAmountAggregationResult> getTotalAmountForDateRange(LocalDateTime from, LocalDateTime to);
+    Optional<TotalAmountAggregationResult> getTotalAmountForDateRange(Date from, Date to);
 }
