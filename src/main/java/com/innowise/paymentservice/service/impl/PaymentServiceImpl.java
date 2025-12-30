@@ -23,6 +23,8 @@ import org.springframework.web.client.RestClientException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -109,7 +111,10 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentSummaryResponse getTotalAmountByUserAndDateRange(Long userId, LocalDateTime from, LocalDateTime to) {
         log.debug("Calculating total amount for userId={} from {} to {}", userId, from, to);
 
-        BigDecimal totalAmount = paymentRepository.getTotalAmountByUserIdAndDateRange(userId, from, to)
+        Date fromDate = Date.from(from.atZone(ZoneId.systemDefault()).toInstant());
+        Date toDate = Date.from(to.atZone(ZoneId.systemDefault()).toInstant());
+
+        BigDecimal totalAmount = paymentRepository.getTotalAmountByUserIdAndDateRange(userId, fromDate, toDate)
                 .map(TotalAmountAggregationResult::totalAmount)
                 .orElse(BigDecimal.ZERO);
 
@@ -132,7 +137,10 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentSummaryResponse getTotalAmountForDateRange(LocalDateTime from, LocalDateTime to) {
         log.debug("Calculating total amount for all users from {} to {}", from, to);
 
-        BigDecimal totalAmount = paymentRepository.getTotalAmountForDateRange(from, to)
+        Date fromDate = Date.from(from.atZone(ZoneId.systemDefault()).toInstant());
+        Date toDate = Date.from(to.atZone(ZoneId.systemDefault()).toInstant());
+
+        BigDecimal totalAmount = paymentRepository.getTotalAmountForDateRange(fromDate, toDate)
                 .map(TotalAmountAggregationResult::totalAmount)
                 .orElse(BigDecimal.ZERO);
 

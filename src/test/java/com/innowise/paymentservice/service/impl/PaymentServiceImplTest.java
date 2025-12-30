@@ -28,6 +28,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +70,7 @@ public class PaymentServiceImplTest {
                     .userId(1L)
                     .paymentAmount(new BigDecimal("100.00"))
                     .build();
-            
+
             Payment savedPayment = Payment.builder()
                     .id("payment-1")
                     .orderId(1L)
@@ -406,7 +407,7 @@ public class PaymentServiceImplTest {
                             .build()
             );
 
-            when(paymentRepository.getTotalAmountByUserIdAndDateRange(userId, from, to))
+            when(paymentRepository.getTotalAmountByUserIdAndDateRange(eq(userId), any(Date.class), any(Date.class)))
                     .thenReturn(Optional.of(
                             new TotalAmountAggregationResult(expectedTotal)
                     ));
@@ -430,7 +431,7 @@ public class PaymentServiceImplTest {
             LocalDateTime from = LocalDateTime.now().minusDays(7);
             LocalDateTime to = LocalDateTime.now();
 
-            when(paymentRepository.getTotalAmountByUserIdAndDateRange(userId, from, to))
+            when(paymentRepository.getTotalAmountByUserIdAndDateRange(eq(userId), any(Date.class), any(Date.class)))
                     .thenReturn(Optional.empty());
             when(paymentRepository.findByUserId(userId)).thenReturn(List.of());
 
@@ -463,16 +464,14 @@ public class PaymentServiceImplTest {
                             .build()
             );
 
-            when(paymentRepository.getTotalAmountForDateRange(from, to))
+            when(paymentRepository.getTotalAmountForDateRange(any(Date.class), any(Date.class)))
                     .thenReturn(Optional.of(
                             new TotalAmountAggregationResult(expectedTotal)
                     ));
             when(paymentRepository.findAll()).thenReturn(allPayments);
 
-            // When
             PaymentSummaryResponse result = paymentService.getTotalAmountForDateRange(from, to);
 
-            // Then
             assertThat(result).isNotNull();
             assertThat(result.totalAmount()).isEqualByComparingTo(expectedTotal);
             assertThat(result.userId()).isNull();

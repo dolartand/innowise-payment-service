@@ -102,7 +102,7 @@ class PaymentServiceIT extends BaseIntegrationTest {
 
         assertThatThrownBy(() -> paymentService.createPayment(request))
                 .isInstanceOf(PaymentAlreadyExistsException.class)
-                .hasMessageContaining("Payment already exists for order: 3");
+                .hasMessageContaining("Payment already exists for orderId=3");
 
         List<Payment> payments = paymentRepository.findAll();
         assertThat(payments).hasSize(1);
