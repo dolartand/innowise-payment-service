@@ -4,15 +4,15 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/payment_db}
+      uri: ${MONGODB_URI:mongodb://payment-mongodb:27017/payment_db}
 
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
-    url: ${MONGODB_URI:mongodb://localhost:27017/payment_db}
+    url: ${MONGODB_URI:mongodb://mongodb:27017/payment_db}
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP_ID:payment-service-group}
       auto-offset-reset: earliest
@@ -38,17 +38,33 @@ randomorg:
 
 service:
   api:
-    key: ${SERVICE_API_KEY:dev-service-key}
+    key: ${SERVICE_API_KEY:service-key}
 
 server:
-  port: ${SERVER_PORT:8084}
+  port: ${SERVER_PORT:8080}
   error:
     include-message: always
-    include-binding-errors: always
+    include-binding-errors: never
+  shutdown: graceful
 
 logging:
   level:
     root: INFO
-    com.innowise.paymentservice: DEBUG
+    com.innowise.paymentservice: INFO
     org.apache.kafka: INFO
-    org.springframework.kafka: DEBUG
+    org.springframework.kafka: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
